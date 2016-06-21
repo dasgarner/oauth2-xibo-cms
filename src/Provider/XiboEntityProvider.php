@@ -122,14 +122,12 @@ class XiboEntityProvider
      */
     private function request($method, $url, $body = [])
     {
-        $options = [
-            'header', 'body'
-        ];
+        $options = [];
 
         if (count($body) > 0)
             $options['body'] = http_build_query($body, null, '&');
 
-        if ($method == 'PUT')
+        if ($method == 'PUT' || $method == 'DELETE')
             $options['headers'] =  ['content-type' => 'application/x-www-form-urlencoded'];
 
         $request = $this->provider->getAuthenticatedRequest($method, $this->provider->getCmsApiUrl() . rtrim($url, '/'), $this->getAccessToken(), $options);
