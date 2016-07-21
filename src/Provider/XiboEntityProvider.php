@@ -9,6 +9,7 @@
 namespace Xibo\OAuth2\Client\Provider;
 
 
+use GuzzleHttp\Psr7\MultipartStream;
 use League\OAuth2\Client\Token\AccessToken;
 use Xibo\OAuth2\Client\Exception\EmptyProviderException;
 
@@ -116,18 +117,23 @@ class XiboEntityProvider
      * Request
      * @param $method
      * @param $url
-     * @param array $body
+     * @param array $params
      * @return mixed
      * @throws EmptyProviderException
      */
-    private function request($method, $url, $body = [])
+    private function request($method, $url, $params = [])
     {
         $options = [
             'header', 'body'
         ];
 
-        if (count($body) > 0)
-            $options['body'] = http_build_query($body, null, '&');
+        // Multipart
+        if (array_key_exists('multipart', $params)) {
+            // Build the multipart message
+            $options['body'] = new MultipartStream($params['multipart']);
+        } else if (count($params) > 0) {
+            $options['body'] = http_build_query($params, null, '&');
+        }
 
         if ($method == 'PUT')
             $options['headers'] =  ['content-type' => 'application/x-www-form-urlencoded'];
